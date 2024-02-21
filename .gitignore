@@ -1,2 +1,2 @@
 github token.txt
-secrets/
+.env/*
