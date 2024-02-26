@@ -7,29 +7,6 @@ import { Box, Tab, Tabs, TextField, Button, List, ListItem, ListItemText, Autoco
 import { TabPanel, TabContext } from '@mui/lab';
 const dayjs = require('dayjs');
 
-
-/*
-function TabPanel(props) {
-  const { children, value, index, ...other } = props;
-
-  return (
-    <div
-      role="tabpanel"
-      hidden={value !== index}
-      id={`simple-tabpanel-${index}`}
-      aria-labelledby={`simple-tab-${index}`}
-      {...other}
-    >
-      {value === index && (
-        <Box sx={{ p: 3 }}>
-          <Box>{children}</Box>
-        </Box>
-      )}
-    </div>
-  );
-}
-*/
-
 function a11yProps(index) {
   return {
     id: `simple-tab-${index}`,
@@ -46,6 +23,8 @@ function App() {
   const [autocompleteKey, setAutocompleteKey] = useState(0); // New state to track the key
   const [tabValue, setTabValue] = useState('1');
   const [selectedDate, setSelectedDate] = useState(null);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+
 
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
@@ -85,6 +64,16 @@ function App() {
     .then(response => {
       // Handle success
       setCarbonFootprint(response.data.totalCarbonFootprint)
+
+      // Update feedback message with the carbon footprint result
+      setFeedbackMessage(`Total Carbon Footprint: ${response.data.totalCarbonFootprint} kgCO2eq`);
+
+      // Reset the form and selected date after submission
+      setFoodList([]); // Clears the list of foods
+      setSelectedDate(null); // Resets the selected date
+      setGramAmount(''); // Clears the gram amount input
+      setSelectedFood(null); // Clears the selected food
+      setAutocompleteKey(prevKey => prevKey + 1); // Resets the Autocomplete component
     })
     .catch(error => {
       console.error('There was an error!', error);
@@ -103,7 +92,6 @@ function App() {
             </Tabs>
           </Box>
           <TabPanel value={tabValue} index="1">
-            {/* Food Input Form integrated here */}
             <div style={{ margin: '20px' }}>
               <DatePicker
                 label="Select Date"
@@ -141,7 +129,7 @@ function App() {
               <Button variant="contained" color="secondary" onClick={calculateCarbonFootprint} style={{ marginTop: '20px' }}>
                 Calculate Carbon Footprint
               </Button>
-              {carbonFootprint && <div style={{ marginTop: '20px' }}>Total Carbon Footprint: {carbonFootprint} kgCO2eq</div>}
+              {feedbackMessage && <div style={{ marginTop: '20px' }}>{feedbackMessage}</div>}
             </div>
           </TabPanel>
           <TabPanel value={tabValue} index="2">

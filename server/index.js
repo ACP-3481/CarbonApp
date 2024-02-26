@@ -40,7 +40,7 @@ app.post('/calculate', express.json(), (req, res) => {
     if (err) {
       return console.error(err.message);
     }
-    res.json({ message: 'Success', id: this.lastID });
+    res.json({ message: 'Success', totalCarbonFootprint: totalCarbonFootprint });
   });
 });
 
