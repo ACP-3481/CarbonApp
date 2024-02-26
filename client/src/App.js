@@ -91,7 +91,7 @@ function App() {
               <Tab label="News" value="3" {...a11yProps(2)} />
             </Tabs>
           </Box>
-          <TabPanel value={tabValue} index="1">
+          <TabPanel value="1">
             <div style={{ margin: '20px' }}>
               <DatePicker
                 label="Select Date"
@@ -132,11 +132,11 @@ function App() {
               {feedbackMessage && <div style={{ marginTop: '20px' }}>{feedbackMessage}</div>}
             </div>
           </TabPanel>
-          <TabPanel value={tabValue} index="2">
+          <TabPanel value="2">
             {/* Placeholder for Graph View */}
             Graph View Content
           </TabPanel>
-          <TabPanel value={tabValue} index="3">
+          <TabPanel value="3">
             {/* Placeholder for News */}
             News - In Development
           </TabPanel>
