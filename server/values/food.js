@@ -26,7 +26,7 @@ const lentils = 0.9;
 const coffee = 3.14;
 const chocolate = 4.87;
 
-export default {
+module.exports = {
   coffee,
   chocolate,
   redMeat,

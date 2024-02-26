@@ -1,3 +1,5 @@
 github token.txt
 .env/*
 src/node_modules
+client/src/node_modules
+server/node_modules

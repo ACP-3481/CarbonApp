@@ -1,17 +1,21 @@
 const express = require('express');
 const cors = require('cors');
+const sqlite3 = require('sqlite3').verbose();
+const foodValues = require('./values/food'); // Adjusted to use require for CommonJS
+
 const app = express();
 const port = 3001;
 
-// Enable CORS for React app development
 app.use(cors());
+app.use(express.json());
 
-// Sample data structure for foods and their carbon footprint values
-const foods = [
-  { name: 'Apple', kgCo2eqPerGram: 0.00024 },
-  { name: 'Beef', kgCo2eqPerGram: 0.027 },
-  // Add more foods here
-];
+const db = new sqlite3.Database('./carbon_footprint.db');
+
+// Convert food values from kgCO2eq to gCO2eq for each food item
+const foods = Object.entries(foodValues).map(([name, kgCo2eq]) => ({
+  name,
+  kgCo2eqPerGram: kgCo2eq / 1000, // Convert kgCO2eq to gCO2eq
+}));
 
 // Endpoint to get list of foods
 app.get('/foods', (req, res) => {
@@ -20,7 +24,11 @@ app.get('/foods', (req, res) => {
 
 // Endpoint to calculate carbon footprint
 app.post('/calculate', express.json(), (req, res) => {
-  const { items } = req.body; // items = [{ name: 'Food Name', grams: 100 }, ...]
+  const { items, date } = req.body; // items = [{ name: 'Food Name', grams: 100 }, ...]
+  const userid = 'defaultUser';
+  const stmt = `INSERT INTO user_footprint (userid, date, carbon_footprint)
+                VALUES (?, ?, ?)
+                ON CONFLICT(userid, date) DO UPDATE SET carbon_footprint = carbon_footprint + ?`;
   const totalCarbonFootprint = items.reduce((total, item) => {
     const food = foods.find(f => f.name === item.name);
     if (food) {
@@ -28,8 +36,14 @@ app.post('/calculate', express.json(), (req, res) => {
     }
     return total;
   }, 0);
-  res.json({ totalCarbonFootprint });
+  db.run(stmt, [userid, date, totalCarbonFootprint, totalCarbonFootprint], function(err) {
+    if (err) {
+      return console.error(err.message);
+    }
+    res.json({ message: 'Success', id: this.lastID });
+  });
 });
+
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);
