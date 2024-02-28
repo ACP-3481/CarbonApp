@@ -44,6 +44,19 @@ app.post('/calculate', express.json(), (req, res) => {
   });
 });
 
+app.get('/history', (req, res) => {
+  const userid = 'defaultUser'; // Use the appropriate user identification method
+  db.all(`SELECT date, carbon_footprint FROM user_footprint WHERE userid = ? ORDER BY date ASC`, [userid], (err, rows) => {
+    if (err) {
+      console.error(err.message);
+      res.status(500).send('Error fetching history');
+      return;
+    }
+    res.json(rows);
+  });
+});
+
+
 
 app.listen(port, () => {
   console.log(`Server listening at http://localhost:${port}`);

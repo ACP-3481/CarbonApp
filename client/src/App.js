@@ -5,6 +5,9 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Box, Tab, Tabs, TextField, Button, List, ListItem, ListItemText, Autocomplete } from '@mui/material';
 import { TabPanel, TabContext } from '@mui/lab';
+import { Line } from 'react-chartjs-2';
+import 'chart.js/auto'; // For Chart.js v3 or newer
+
 const dayjs = require('dayjs');
 
 function a11yProps(index) {
@@ -24,6 +27,8 @@ function App() {
   const [tabValue, setTabValue] = useState('1');
   const [selectedDate, setSelectedDate] = useState(null);
   const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [historicalData, setHistoricalData] = useState([]);
+
 
 
   const handleChange = (event, newValue) => {
@@ -31,10 +36,17 @@ function App() {
   };
 
   useEffect(() => {
+    if (tabValue === "2") { // Corresponds to the "Graph View" tab
+      axios.get('http://localhost:3001/history') // Adjust the URL based on your actual endpoint
+        .then(response => {
+          setHistoricalData(response.data);
+        })
+        .catch(error => console.error('There was an error fetching the history:', error));
+    }
     axios.get('http://localhost:3001/foods')
       .then(response => setFoods(response.data))
       .catch(error => console.error('There was an error!', error));
-  }, []);
+  }, [tabValue]);
 
   const handleAddFood = () => {
     if (selectedFood && gramAmount) {
@@ -133,8 +145,29 @@ function App() {
             </div>
           </TabPanel>
           <TabPanel value="2">
-            {/* Placeholder for Graph View */}
-            Graph View Content
+            {historicalData.length > 0 ? (
+              <Line
+                data={{
+                  labels: historicalData.map(data => data.date),
+                  datasets: [{
+                    label: 'Carbon Footprint',
+                    data: historicalData.map(data => data.carbon_footprint),
+                    fill: false,
+                    backgroundColor: 'rgb(75, 192, 192)',
+                    borderColor: 'rgba(75, 192, 192, 0.2)',
+                  }],
+                }}
+                options={{
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }}
+              />
+            ) : (
+              <p>No data available</p>
+            )}
           </TabPanel>
           <TabPanel value="3">
             {/* Placeholder for News */}
