@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
@@ -7,6 +7,7 @@ import { Box, Tab, Tabs, TextField, Button, List, ListItem, ListItemText, Autoco
 import { TabPanel, TabContext } from '@mui/lab';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto'; // For Chart.js v3 or newer
+
 
 const dayjs = require('dayjs');
 
@@ -27,8 +28,24 @@ function App() {
   const [tabValue, setTabValue] = useState('1');
   const [selectedDate, setSelectedDate] = useState(null);
   const [historicalData, setHistoricalData] = useState([]);
+  const chartRef = useRef(null);
 
+  const handleSaveChartImage = () => {
+    if (chartRef.current) {
+      const chart = chartRef.current; // No need for .chartInstance
+      const imageData = chart.toBase64Image();
+      
+      // Now, you can use imageData to save the image or share it
+      console.log(imageData); // This logs the base64 image data
 
+      axios.post('http://localhost:3001/save-graph', { imageData })
+      .then(response => {
+        // Here you would handle the response, e.g., storing the returned image URL
+        console.log(response.data.imageUrl); // Assuming your server responds with the image URL
+      })
+      .catch(error => console.error('Error saving graph image:', error));
+    }
+  };
 
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
@@ -143,6 +160,7 @@ function App() {
           <TabPanel value="2">
             {historicalData.length > 0 ? (
               <Line
+                ref={chartRef}
                 data={{
                   labels: historicalData.map(data => data.date),
                   datasets: [{
@@ -164,6 +182,14 @@ function App() {
             ) : (
               <p>No data available</p>
             )}
+            <Button
+              variant="contained" // Solid background color
+              color="primary" // Use the theme's primary color
+              onClick={handleSaveChartImage}
+              startIcon={<AddCircleOutlineIcon />} // Add an icon (import necessary)
+            >
+              Save Chart Image
+            </Button>
           </TabPanel>
           <TabPanel value="3">
             {/* Placeholder for News */}
