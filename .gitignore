@@ -4,3 +4,4 @@ src/node_modules
 client/src/node_modules
 server/node_modules
 server/carbon_footprint.db
+server/images/*
