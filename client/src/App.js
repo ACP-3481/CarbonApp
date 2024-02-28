@@ -26,7 +26,6 @@ function App() {
   const [autocompleteKey, setAutocompleteKey] = useState(0); // New state to track the key
   const [tabValue, setTabValue] = useState('1');
   const [selectedDate, setSelectedDate] = useState(null);
-  const [feedbackMessage, setFeedbackMessage] = useState('');
   const [historicalData, setHistoricalData] = useState([]);
 
 
@@ -76,9 +75,6 @@ function App() {
     .then(response => {
       // Handle success
       setCarbonFootprint(response.data.totalCarbonFootprint)
-
-      // Update feedback message with the carbon footprint result
-      setFeedbackMessage(`Total Carbon Footprint: ${response.data.totalCarbonFootprint} kgCO2eq`);
 
       // Reset the form and selected date after submission
       setFoodList([]); // Clears the list of foods
@@ -141,7 +137,7 @@ function App() {
               <Button variant="contained" color="secondary" onClick={calculateCarbonFootprint} style={{ marginTop: '20px' }}>
                 Calculate Carbon Footprint
               </Button>
-              {feedbackMessage && <div style={{ marginTop: '20px' }}>{feedbackMessage}</div>}
+              {carbonFootprint && <div style={{ marginTop: '20px' }}>Total Carbon Footprint: {carbonFootprint} kgCO2eq</div>}
             </div>
           </TabPanel>
           <TabPanel value="2">

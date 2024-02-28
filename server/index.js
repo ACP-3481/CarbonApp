@@ -2,12 +2,15 @@ const express = require('express');
 const cors = require('cors');
 const sqlite3 = require('sqlite3').verbose();
 const foodValues = require('./values/food'); // Adjusted to use require for CommonJS
+const path = require('path');
 
 const app = express();
 const port = 3001;
 
 app.use(cors());
 app.use(express.json());
+app.use('/images', express.static('images'));
+
 
 const db = new sqlite3.Database('./carbon_footprint.db');
 
@@ -56,6 +59,22 @@ app.get('/history', (req, res) => {
   });
 });
 
+app.post('/save-graph', express.json({limit: '50mb'}), (req, res) => {
+  const { imageData } = req.body; // Base64 encoded image data
+  const imageName = `graph_${Math.random().toString(36).substring(2, 15)}.png`;
+  const imagePath = path.join(__dirname, 'images', imageName);
+
+  // Decode image data and save the file
+  const base64Data = imageData.replace(/^data:image\/png;base64,/, "");
+  fs.writeFile(imagePath, base64Data, 'base64', (err) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send('Error saving image');
+      return;
+    }
+    res.send({ imageUrl: `http://127.0.0.1:3000/images/${imageName}` }); // Adjust the URL/port as necessary
+  });
+});
 
 
 app.listen(port, () => {
