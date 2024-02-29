@@ -17,6 +17,14 @@ db.serialize(() => {
     UNIQUE(userid, date)
   );
   `);
+  db.run(`CREATE TABLE IF NOT EXISTS users (
+    userid TEXT PRIMARY KEY UNIQUE,
+    display_name TEXT NOT NULL,
+    salt TEXT NOT NULL,
+    hash TEXT NOT NULL,
+    email TEXT NOT NULL UNIQUE,
+    email_verified INTEGER DEFAULT 0 NOT NULL
+  )`)
 
   console.log('Table created or already exists.');
 });
