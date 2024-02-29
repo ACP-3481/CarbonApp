@@ -7,6 +7,7 @@ import { Box, Tab, Tabs, TextField, Button, List, ListItem, ListItemText, Autoco
 import { TabPanel, TabContext } from '@mui/lab';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto'; // For Chart.js v3 or newer
+import { EmailShareButton, TwitterShareButton, FacebookShareButton} from 'react-share';
 
 
 const dayjs = require('dayjs');
@@ -29,21 +30,21 @@ function App() {
   const [selectedDate, setSelectedDate] = useState(null);
   const [historicalData, setHistoricalData] = useState([]);
   const chartRef = useRef(null);
+  const [shareImageUrl, setShareImageUrl] = useState('');
 
-  const handleSaveChartImage = () => {
+
+  const handleSaveChartImage = async () => {
     if (chartRef.current) {
-      const chart = chartRef.current; // No need for .chartInstance
+      const chart = chartRef.current;
       const imageData = chart.toBase64Image();
-      
-      // Now, you can use imageData to save the image or share it
-      console.log(imageData); // This logs the base64 image data
-
-      axios.post('http://localhost:3001/save-graph', { imageData })
-      .then(response => {
-        // Here you would handle the response, e.g., storing the returned image URL
-        console.log(response.data.imageUrl); // Assuming your server responds with the image URL
-      })
-      .catch(error => console.error('Error saving graph image:', error));
+  
+      try {
+        const response = await axios.post('http://localhost:3001/save-graph', { imageData });
+        setShareImageUrl(response.data.imageUrl); // Update state with the image URL
+      } catch (error) {
+        console.error('Error saving graph image:', error);
+        setShareImageUrl('Error saving graph image, please try again'); // Reset or handle error
+      }
     }
   };
 
@@ -182,14 +183,16 @@ function App() {
             ) : (
               <p>No data available</p>
             )}
-            <Button
-              variant="contained" // Solid background color
-              color="primary" // Use the theme's primary color
-              onClick={handleSaveChartImage}
-              startIcon={<AddCircleOutlineIcon />} // Add an icon (import necessary)
-            >
-              Save Chart Image
-            </Button>
+            {shareImageUrl && (
+              <>
+                <TwitterShareButton url={shareImageUrl} title={"Check out my carbon footprint graph!"}>
+                  Share on Twitter
+                </TwitterShareButton>
+                <FacebookShareButton url={shareImageUrl} quote={"Check out my carbon footprint graph!"}>
+                  Share on Facebook
+                </FacebookShareButton>
+              </>
+            )}
           </TabPanel>
           <TabPanel value="3">
             {/* Placeholder for News */}
