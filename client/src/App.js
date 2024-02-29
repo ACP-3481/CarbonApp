@@ -50,16 +50,23 @@ function App() {
 
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
-    handleSaveChartImage();
   };
-
-  useEffect(() => {
-    if (tabValue === "2") { // Corresponds to the "Graph View" tab
-      axios.get('http://localhost:3001/history') // Adjust the URL based on your actual endpoint
+  const getGraphData = () => {
+    axios.get('http://localhost:3001/history') // Adjust the URL based on your actual endpoint
         .then(response => {
           setHistoricalData(response.data);
         })
         .catch(error => console.error('There was an error fetching the history:', error));
+  }
+  useEffect(() => {
+    let ignore = false;
+    if (!ignore) {
+      getGraphData();
+      handleSaveChartImage();
+      ignore = true;
+    }
+    if (tabValue === "2") { // Corresponds to the "Graph View" tab
+      getGraphData();
     }
     axios.get('http://localhost:3001/foods')
       .then(response => setFoods(response.data))
@@ -101,6 +108,7 @@ function App() {
       setGramAmount(''); // Clears the gram amount input
       setSelectedFood(null); // Clears the selected food
       setAutocompleteKey(prevKey => prevKey + 1); // Resets the Autocomplete component
+      handleSaveChartImage();
     })
     .catch(error => {
       console.error('There was an error!', error);
