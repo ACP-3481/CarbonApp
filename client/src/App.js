@@ -7,7 +7,7 @@ import { Box, Tab, Tabs, TextField, Button, List, ListItem, ListItemText, Autoco
 import { TabPanel, TabContext } from '@mui/lab';
 import { Line } from 'react-chartjs-2';
 import 'chart.js/auto'; // For Chart.js v3 or newer
-import { EmailShareButton, TwitterShareButton, FacebookShareButton} from 'react-share';
+import { TwitterShareButton, FacebookShareButton, TwitterIcon, FacebookIcon } from 'react-share';
 
 
 const dayjs = require('dayjs');
@@ -50,6 +50,7 @@ function App() {
 
   const handleChange = (event, newValue) => {
     setTabValue(newValue);
+    handleSaveChartImage();
   };
 
   useEffect(() => {
@@ -186,10 +187,10 @@ function App() {
             {shareImageUrl && (
               <>
                 <TwitterShareButton url={shareImageUrl} title={"Check out my carbon footprint graph!"}>
-                  Share on Twitter
+                  <TwitterIcon size={32} round={true} />
                 </TwitterShareButton>
                 <FacebookShareButton url={shareImageUrl} quote={"Check out my carbon footprint graph!"}>
-                  Share on Facebook
+                  <FacebookIcon size={32} round={true} />
                 </FacebookShareButton>
               </>
             )}
